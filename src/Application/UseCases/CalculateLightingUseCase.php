@@ -132,3 +132,4 @@ final class CalculateLightingUseCase
         return $monthlyKwh * self::KWH_PRICE_EUR;
     }
 }
+

@@ -1,0 +1,757 @@
+/* ============================================================
+   LuminaAdvisor — Design System
+   Dark Mode · Glassmorphism · Accent Ámbar
+   ============================================================ */
+
+/* ── 1. Design Tokens ───────────────────────────────────────── */
+:root {
+  /* Colores base */
+  --bg-primary:    #0a0a0f;
+  --bg-secondary:  #13131a;
+  --bg-tertiary:   #1a1a24;
+
+  /* Glassmorphism */
+  --glass-bg:      rgba(255, 255, 255, 0.04);
+  --glass-bg-hover:rgba(255, 255, 255, 0.07);
+  --glass-border:  rgba(255, 255, 255, 0.08);
+  --glass-border-active: rgba(245, 158, 11, 0.5);
+
+  /* Accent ámbar */
+  --accent:        #f59e0b;
+  --accent-light:  #fbbf24;
+  --accent-dark:   #d97706;
+  --accent-glow:   rgba(245, 158, 11, 0.15);
+  --accent-glow-strong: rgba(245, 158, 11, 0.3);
+
+  /* Texto */
+  --text-primary:  #e2e8f0;
+  --text-secondary:#94a3b8;
+  --text-muted:    #64748b;
+
+  /* Estados */
+  --success:       #10b981;
+  --error:         #ef4444;
+  --error-bg:      rgba(239, 68, 68, 0.1);
+
+  /* Tipografía */
+  --font-sans:     'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono:     'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Espaciado */
+  --radius-sm:     8px;
+  --radius-md:     12px;
+  --radius-lg:     20px;
+  --radius-xl:     28px;
+
+  /* Sombras */
+  --shadow-sm:     0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:     0 8px 32px rgba(0,0,0,0.4);
+  --shadow-accent: 0 8px 32px rgba(245, 158, 11, 0.2);
+
+  /* Transiciones */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── 2. Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Fondo con gradiente sutil */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 20% 10%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(245, 158, 11, 0.03) 0%, transparent 50%);
+}
+
+/* ── 3. Tipografía ───────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* ── 4. Layout Principal ─────────────────────────────────────── */
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── 5. Header ───────────────────────────────────────────────── */
+.app-header {
+  padding: 32px 0 24px;
+  text-align: center;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.app-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.logo-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: var(--shadow-accent);
+}
+
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-tagline {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ── 6. Main Content ─────────────────────────────────────────── */
+.app-main {
+  flex: 1;
+  padding: 40px 0 80px;
+}
+
+/* ── 7. Progress Bar (Wizard) ────────────────────────────────── */
+.wizard-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 40px;
+}
+
+.progress-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.progress-step-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all var(--transition-normal);
+  position: relative;
+  z-index: 1;
+}
+
+.progress-step.active .progress-step-bubble {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent-glow-strong);
+}
+
+.progress-step.done .progress-step-bubble {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: #000;
+}
+
+.progress-step-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: color var(--transition-normal);
+}
+
+.progress-step.active .progress-step-label {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.progress-line {
+  height: 2px;
+  width: 80px;
+  background: var(--glass-border);
+  margin-bottom: 22px;
+  position: relative;
+}
+
+.progress-line.done {
+  background: var(--accent-dark);
+}
+
+/* ── 8. Glass Card ───────────────────────────────────────────── */
+.glass-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 36px;
+  box-shadow: var(--shadow-md);
+}
+
+.glass-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.glass-card-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  margin-bottom: 28px;
+}
+
+/* ── 9. Wizard Steps ─────────────────────────────────────────── */
+.wizard-step {
+  display: none;
+  animation: stepIn var(--transition-slow) forwards;
+}
+
+.wizard-step.active {
+  display: block;
+}
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── 10. Room Type Selector ──────────────────────────────────── */
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.room-option {
+  position: relative;
+}
+
+.room-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.room-option label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-align: center;
+  user-select: none;
+}
+
+.room-option label:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(245, 158, 11, 0.3);
+  transform: translateY(-2px);
+}
+
+.room-option input[type="radio"]:checked + label {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  box-shadow: 0 0 24px var(--accent-glow-strong), inset 0 0 12px var(--accent-glow);
+}
+
+.room-icon {
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.room-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.room-option input[type="radio"]:checked + label .room-label {
+  color: var(--accent);
+}
+
+/* ── 11. Form Fields ─────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 5px;
+}
+
+/* ── 12. Wall Color Swatches ─────────────────────────────────── */
+.swatch-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.swatch-option {
+  position: relative;
+}
+
+.swatch-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.swatch-option label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.swatch-option label:hover {
+  transform: scale(1.08);
+}
+
+.swatch-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.swatch-option input[type="radio"]:checked + label .swatch-circle {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow-strong);
+}
+
+.swatch-name {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.swatch-option input[type="radio"]:checked + label .swatch-name {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Colores de swatches */
+.swatch-blanco  { background: #f5f5f0; }
+.swatch-beige   { background: #d4b896; }
+.swatch-gris    { background: #808080; }
+.swatch-azul    { background: #4a7fa5; }
+.swatch-rojo    { background: #c0392b; }
+.swatch-negro   { background: #1a1a1a; border: 2px solid #333; }
+
+/* ── 13. Windows Selector ────────────────────────────────────── */
+.windows-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.window-option {
+  position: relative;
+}
+
+.window-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.window-option label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--glass-bg);
+  border: 1.5px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.window-option label:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.window-option input[type="radio"]:checked + label {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.window-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+/* ── 14. Error messages ──────────────────────────────────────── */
+.form-error {
+  font-size: 0.78rem;
+  color: var(--error);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.error-banner {
+  background: var(--error-bg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--error);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+
+/* ── 15. Botones ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 28px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-normal);
+  letter-spacing: 0.01em;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #000;
+  box-shadow: 0 4px 20px var(--accent-glow-strong);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px var(--accent-glow-strong);
+  background: linear-gradient(135deg, var(--accent-light), var(--accent));
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--glass-border);
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.2);
+  background: var(--glass-bg-hover);
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+/* ── 16. Result Cards ────────────────────────────────────────── */
+.result-wrapper {
+  animation: stepIn var(--transition-slow) forwards;
+}
+
+.result-hero {
+  text-align: center;
+  margin-bottom: 32px;
+  padding: 40px 36px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+.result-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 0%, var(--accent-glow), transparent);
+  pointer-events: none;
+}
+
+.result-badge {
+  display: inline-block;
+  background: var(--accent-glow);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 20px;
+}
+
+.result-lumens {
+  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  background: linear-gradient(135deg, #fff 30%, var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.result-lumens-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.result-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: transform var(--transition-normal), border-color var(--transition-normal);
+}
+
+.result-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.result-card-icon {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.result-card-value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  margin-bottom: 2px;
+}
+
+.result-card-value.accent {
+  color: var(--accent);
+}
+
+.result-card-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.result-card-desc {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Card de temperatura de color */
+.temp-bar {
+  height: 6px;
+  border-radius: 3px;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.temp-bar-calida { background: linear-gradient(90deg, #ff6b35, #f59e0b); }
+.temp-bar-neutra { background: linear-gradient(90deg, #f59e0b, #ffffff88); }
+.temp-bar-fria   { background: linear-gradient(90deg, #60a5fa, #e0f2fe); }
+
+/* Card de luminaria — full width */
+.result-card-full {
+  grid-column: 1 / -1;
+}
+
+/* Card de consumo — highlight ámbar */
+.result-card-cost {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.03));
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+/* ── 17. Footer ──────────────────────────────────────────────── */
+.app-footer {
+  padding: 24px 0;
+  text-align: center;
+  border-top: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.app-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* ── 18. Utilities ───────────────────────────────────────────── */
+.mt-4  { margin-top: 16px; }
+.mt-6  { margin-top: 24px; }
+.mt-8  { margin-top: 32px; }
+.mb-6  { margin-bottom: 24px; }
+.text-center { text-align: center; }
+
+/* ── 19. Responsive ──────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .glass-card { padding: 24px 20px; }
+
+  .room-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .room-option label { padding: 14px 8px; }
+  .room-icon { font-size: 1.6rem; }
+
+  .form-row { grid-template-columns: 1fr; }
+
+  .windows-grid { grid-template-columns: 1fr; }
+
+  .result-grid { grid-template-columns: 1fr; }
+
+  .wizard-nav { flex-direction: column-reverse; }
+  .wizard-nav .btn { width: 100%; }
+
+  .result-lumens { font-size: 3rem; }
+}
+
+/* ── 20. Loading state ───────────────────────────────────────── */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.btn-loading::after {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
