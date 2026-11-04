@@ -125,3 +125,4 @@ Temperatura de color por uso:
 - Lógica de negocio core definida (fórmula UNE-EN 12464)
 - Parámetros de entrada definidos: tipo de habitación, color de paredes, m², altura techo, ventanas
 - Parámetros de salida: lúmenes totales, temperatura de color, nº de puntos de luz, kWh/mes + €/mes
+

@@ -11,3 +11,4 @@ Guardar el estado actual del proyecto en MEMORY.md y crear backup con timestamp.
 
 ## Trigger
 Al completar un hito, resolver un bug crítico o cerrar una sesión de trabajo.
+

@@ -11,3 +11,4 @@ Limpiar y sintetizar MEMORY.md cuando se vuelva muy extenso, preservando solo lo
 
 ## Trigger
 Cuando MEMORY.md supere las 200 líneas o Martín pida `/clean_context`.
+

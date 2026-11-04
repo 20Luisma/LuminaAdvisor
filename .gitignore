@@ -28,3 +28,4 @@ logs/
 # Backups de BD
 *.sql
 *.sql.gz
+

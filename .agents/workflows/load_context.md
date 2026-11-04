@@ -12,3 +12,4 @@ Cargar la memoria persistente del proyecto LuminaAdvisor al iniciar una nueva se
 
 ## Trigger
 Al inicio de cualquier sesión nueva en este workspace.
+

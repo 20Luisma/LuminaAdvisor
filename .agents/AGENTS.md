@@ -8,3 +8,4 @@ Este workspace aplica las reglas globales de Antigravity God-Mode más las regla
 4. Blindaje absoluto de credenciales en .env (Regla 19)
 5. Lógica de negocio basada en norma UNE-EN 12464-1
 6. Design System Dark Mode Fintech con accent ámbar (#f59e0b)
+

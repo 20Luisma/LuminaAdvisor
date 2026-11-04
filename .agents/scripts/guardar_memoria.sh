@@ -7,3 +7,4 @@ DEST="memory_backups/MEMORY_${TIMESTAMP}.md"
 
 cp MEMORY.md "$DEST"
 echo "✅ Backup guardado en: $DEST"
+

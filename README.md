@@ -59,3 +59,4 @@ LuminaAdvisor/
 | Baño | 200–500 lux | 3500K–4000K (neutra) |
 | Despacho | 500–750 lux | 4000K–5000K (fría) |
 | Pasillo | 100–150 lux | 3000K (neutra-cálida) |
+

@@ -26,3 +26,4 @@ Usar **PHP 8.4+ con Clean Architecture** (mismo stack que GastosMartin), sin fra
 - ✅ Sin npm, sin Composer obligatorio para MVP
 - ✅ Cero frameworks = cero breaking changes futuros
 - ⚠️ Para escalar a multi-usuario real, se necesitará auth layer (sesiones PHP)
+

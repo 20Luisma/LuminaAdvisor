@@ -87,3 +87,4 @@ find src public -name "*.php" -exec php -l {} \;
 Lee `MEMORY.md` antes de cualquier decisión técnica.  
 Actualiza `MEMORY.md` al completar cada hito o resolver bugs críticos.  
 Backup automático en `memory_backups/` con `bin/guardar_memoria.sh`.
+
