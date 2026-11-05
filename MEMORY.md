@@ -68,8 +68,8 @@ LuminaAdvisor/
 - [x] Repositorio GitHub conectado y sincronizado (`20Luisma/LuminaAdvisor`)
 - [x] Despliegue en producción Hostinger activo (`contenido.creawebes.com/LuminaAdvisor/`)
 - [x] Croquis visual 2D de distribución de puntos de luz en plano esquemático
-- [x] Asesora Lumina conversacional interactiva (Chat AJAX en vivo con memoria de contexto de habitación)
-- [x] Tono de IA humanizado: prohibida la jerga técnica innecesaria (sin UGR, R9 ni deslumbramiento supino)
+- [x] Copiloto IA flotante profesional (FAB fijo con pulso verde + Drawer lateral deslizable con backdrop blur)
+- [x] Tono de IA humanizado: lenguaje terrenal y práctico, chips de 1 clic y memoria de habitación
 
 ---
 
@@ -127,6 +127,7 @@ Temperatura de color por uso:
 - Caso de uso `CalculateLightingUseCase.php` con física exacta UNE-EN 12464-1 (cero alucinaciones).
 - Interfaz completa: Front Controller `index.php`, `LightingController.php`, wizard de 2 pasos, glassmorphism con acento ámbar (`style.css`), animaciones de contadores (`app.js`).
 - Croquis 2D: Plano de planta cenital esquemático renderizado dinámicamente con halos de luz y etiquetas de puntos.
+- Copiloto IA flotante: Botón FAB fijo en esquina con pulso verde, drawer deslizante profesional (`copilot.php`), header con live-dot, chips de preguntas rápidas, historial conversacional y botón de limpiar.
 - Tono humanizado: Ajuste de prompt en `GeminiInteriorAdvisor.php` prohibiendo jerga de laboratorio (UGR, R9, cenital, etc.).
 - Chat conversacional: `ChatController.php` conectado a Gemini 3.8 Flash con memoria de contexto de habitación y chips de preguntas sugeridas.
 - Pipeline de deploy: `bin/deploy.sh` blindado (lee credenciales de `.env` ignorado en git).
