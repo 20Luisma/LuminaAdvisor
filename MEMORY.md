@@ -67,7 +67,9 @@ LuminaAdvisor/
 - [x] Calcular consumo €/mes y kWh/mes del setup
 - [x] Repositorio GitHub conectado y sincronizado (`20Luisma/LuminaAdvisor`)
 - [x] Despliegue en producción Hostinger activo (`contenido.creawebes.com/LuminaAdvisor/`)
-- [x] Integración con IA: Asesor de Interiorismo con Google Gemini 3.8 Flash (distribución espacial, capas de luz, consejos pro con JSON estructurado)
+- [x] Croquis visual 2D de distribución de puntos de luz en plano esquemático
+- [x] Asesora Lumina conversacional interactiva (Chat AJAX en vivo con memoria de contexto de habitación)
+- [x] Tono de IA humanizado: prohibida la jerga técnica innecesaria (sin UGR, R9 ni deslumbramiento supino)
 
 ---
 
@@ -120,14 +122,14 @@ Temperatura de color por uso:
 
 ## 🕰️ Historial de Sesiones
 
-### 2026-11-05 (Sesión 2 — MVP Completo, Deploy Producción e Integración IA)
+### 2026-11-05 (Sesión 2 — MVP Completo, Deploy Producción, Croquis 2D y Chat con IA)
 - Implementación de entidades: `Room.php` y `LightRecommendation.php`.
 - Caso de uso `CalculateLightingUseCase.php` con física exacta UNE-EN 12464-1 (cero alucinaciones).
 - Interfaz completa: Front Controller `index.php`, `LightingController.php`, wizard de 2 pasos, glassmorphism con acento ámbar (`style.css`), animaciones de contadores (`app.js`).
-- Configuración de Apache: `index.php` raíz y `.htaccess` con rewrite a `public/`.
+- Croquis 2D: Plano de planta cenital esquemático renderizado dinámicamente con halos de luz y etiquetas de puntos.
+- Tono humanizado: Ajuste de prompt en `GeminiInteriorAdvisor.php` prohibiendo jerga de laboratorio (UGR, R9, cenital, etc.).
+- Chat conversacional: `ChatController.php` conectado a Gemini 3.8 Flash con memoria de contexto de habitación y chips de preguntas sugeridas.
 - Pipeline de deploy: `bin/deploy.sh` blindado (lee credenciales de `.env` ignorado en git).
-- Integración con IA: `GeminiInteriorAdvisor.php` consumiendo API de Google Gemini 3.8 Flash (`responseMimeType: application/json`, `thinkingBudget: 0` para latencia < 2s).
-- Tarjeta de Interiorismo en UI con distribución en el espacio, capas de luz y consejos pro.
 - Despliegue completado y verificado en Hostinger: `https://contenido.creawebes.com/LuminaAdvisor/` (HTTP 200).
 
 ### 2026-11-04 (Sesión 1 — Bootstrap)
