@@ -1201,7 +1201,7 @@ h1, h2, h3, h4 {
 }
 
 .copilot-drawer-overlay.open {
-  display: flex;
+  display: flex !important;
   opacity: 1;
 }
 

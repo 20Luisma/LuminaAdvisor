@@ -10,7 +10,7 @@
 </button>
 
 <!-- DRAWER / VENTANA DEL AGENTE IA -->
-<div id="copilotDrawerOverlay" class="copilot-drawer-overlay">
+<div id="copilotDrawerOverlay" class="copilot-drawer-overlay" style="display:none;">
   <div class="copilot-drawer">
     
     <!-- Header -->
@@ -57,3 +57,4 @@
 
   </div>
 </div>
+

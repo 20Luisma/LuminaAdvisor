@@ -196,7 +196,10 @@
 
     // Abrir Drawer
     function openDrawer() {
-      overlay.classList.add('open');
+      overlay.style.display = 'flex';
+      setTimeout(() => {
+        overlay.classList.add('open');
+      }, 10);
       state.drawerOpen = true;
       setTimeout(() => input?.focus(), 300);
       updateGreetingWithContext();
@@ -205,6 +208,9 @@
     // Cerrar Drawer
     function closeDrawer() {
       overlay.classList.remove('open');
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 250);
       state.drawerOpen = false;
     }
 

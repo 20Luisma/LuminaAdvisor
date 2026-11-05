@@ -1,6 +1,11 @@
 <?php declare(strict_types=1);
 // Template: layout.php — Shell HTML completo
 // Variables disponibles: $data, $errors, $result (de LightingController)
+
+$cssFile = __DIR__ . '/../public/css/style.css';
+$jsFile  = __DIR__ . '/../public/js/app.js';
+$cssVer  = file_exists($cssFile) ? (string) filemtime($cssFile) : (string) time();
+$jsVer   = file_exists($jsFile)  ? (string) filemtime($jsFile)  : (string) time();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -12,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=<?= $cssVer ?>">
 </head>
 <body>
 
@@ -51,7 +56,6 @@
 
 <?php require __DIR__ . '/copilot.php'; ?>
 
-<script src="js/app.js"></script>
+<script src="js/app.js?v=<?= $jsVer ?>"></script>
 </body>
 </html>
-
