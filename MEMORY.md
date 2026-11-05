@@ -59,13 +59,15 @@ LuminaAdvisor/
 ## 📌 Estado Actual del Proyecto
 
 - [x] Bootstrap completo del proyecto (estructura, MEMORY.md, AGENTS.md, .gitignore)
-- [ ] Definir entidad de dominio `Room.php` con todos los parámetros de entrada
-- [ ] Implementar `CalculateLightingUseCase.php` con lógica UNE-EN 12464
-- [ ] Crear tabla de lúmenes y temperatura de color por tipo de habitación
-- [ ] Diseñar UI: formulario de entrada + resultado visual premium
-- [ ] Integrar el factor de reflexión de paredes (blanco: 0.8, beige: 0.6, gris: 0.4, negro: 0.1)
-- [ ] Calcular consumo €/mes del setup recomendado
-- [ ] Inicializar repositorio Git y primer commit de bootstrap
+- [x] Definir entidad de dominio `Room.php` con todos los parámetros de entrada
+- [x] Implementar `CalculateLightingUseCase.php` con lógica UNE-EN 12464
+- [x] Crear tabla de lúmenes y temperatura de color por tipo de habitación
+- [x] Diseñar UI: wizard de 2 pasos + glassmorphism ámbar + resultado animado
+- [x] Integrar factor de reflexión de paredes y factor de luz natural
+- [x] Calcular consumo €/mes y kWh/mes del setup
+- [x] Repositorio GitHub conectado y sincronizado (`20Luisma/LuminaAdvisor`)
+- [x] Despliegue en producción Hostinger activo (`contenido.creawebes.com/LuminaAdvisor/`)
+- [ ] Posible integración opcional con IA (Gemini) para consejos de estilismo/interiorismo
 
 ---
 
@@ -117,6 +119,14 @@ Temperatura de color por uso:
 ---
 
 ## 🕰️ Historial de Sesiones
+
+### 2026-11-05 (Sesión 2 — MVP Completo y Deploy Producción)
+- Implementación de entidades: `Room.php` y `LightRecommendation.php`.
+- Caso de uso `CalculateLightingUseCase.php` con física exacta UNE-EN 12464-1 (cero alucinaciones).
+- Interfaz completa: Front Controller `index.php`, `LightingController.php`, wizard de 2 pasos, glassmorphism con acento ámbar (`style.css`), animaciones de contadores (`app.js`).
+- Configuración de Apache: `index.php` raíz y `.htaccess` con rewrite a `public/`.
+- Pipeline de deploy: `bin/deploy.sh` blindado (lee credenciales de `.env` ignorado en git).
+- Despliegue completado y verificado en Hostinger: `https://contenido.creawebes.com/LuminaAdvisor/` (HTTP 200).
 
 ### 2026-11-04 (Sesión 1 — Bootstrap)
 - Concepción del proyecto: asesor de luminarias para el hogar
