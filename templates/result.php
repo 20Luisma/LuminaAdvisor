@@ -84,9 +84,10 @@ $colorLabel  = $colorLabels[$colorCat] ?? $colorCat;
 
   <!-- CTA: Calcular otra habitación -->
   <div class="text-center mt-8">
-    <a href="/" class="btn btn-ghost" style="display:inline-flex;">
+    <a href="./" class="btn btn-ghost" style="display:inline-flex;">
       ← Calcular otra habitación
     </a>
   </div>
 
 </div>
+

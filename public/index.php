@@ -7,3 +7,4 @@ require_once __DIR__ . '/../src/Autoloader.php';
 use LuminaAdvisor\Presentation\Controllers\LightingController;
 
 (new LightingController())->handle();
+
