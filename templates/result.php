@@ -82,6 +82,42 @@ $colorLabel  = $colorLabels[$colorCat] ?? $colorCat;
 
   </div>
 
+  <?php if (!empty($aiAdvice)): ?>
+  <!-- ASESOR DE INTERIORISMO POR IA -->
+  <div class="ai-advisor-card">
+    <div class="ai-advisor-header">
+      <span class="ai-advisor-badge">✨ Asesor de Interiorismo · Gemini IA</span>
+      <h3 class="ai-advisor-title">Recomendaciones de diseño para tu <?= $roomLabel ?></h3>
+    </div>
+    
+    <div class="ai-advisor-items">
+      <div class="ai-advisor-item">
+        <div class="ai-advisor-icon">📐</div>
+        <div>
+          <strong>Distribución en el espacio</strong>
+          <p><?= $aiAdvice['distribucion'] ?></p>
+        </div>
+      </div>
+      
+      <div class="ai-advisor-item">
+        <div class="ai-advisor-icon">🕯️</div>
+        <div>
+          <strong>Capas de luz y ambiente</strong>
+          <p><?= $aiAdvice['estilo_ambiente'] ?></p>
+        </div>
+      </div>
+      
+      <div class="ai-advisor-item">
+        <div class="ai-advisor-icon">💡</div>
+        <div>
+          <strong>Consejo profesional</strong>
+          <p><?= $aiAdvice['consejo_pro'] ?></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+
   <!-- CTA: Calcular otra habitación -->
   <div class="text-center mt-8">
     <a href="./" class="btn btn-ghost" style="display:inline-flex;">

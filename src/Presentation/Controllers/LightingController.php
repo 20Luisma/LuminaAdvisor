@@ -6,17 +6,19 @@ namespace LuminaAdvisor\Presentation\Controllers;
 
 use LuminaAdvisor\Application\UseCases\CalculateLightingUseCase;
 use LuminaAdvisor\Domain\Entities\Room;
+use LuminaAdvisor\Infrastructure\AI\GeminiInteriorAdvisor;
 
 final class LightingController
 {
     public function handle(): void
     {
-        $data   = [];
-        $errors = [];
-        $result = null;
+        $data     = [];
+        $errors   = [];
+        $result   = null;
+        $aiAdvice = null;
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            [$data, $errors, $result] = $this->processPost();
+            [$data, $errors, $result, $aiAdvice] = $this->processPost();
         }
 
         require __DIR__ . '/../../../templates/layout.php';
@@ -32,10 +34,12 @@ final class LightingController
             'windows'        => trim((string) ($_POST['windows']       ?? '')),
         ];
 
-        $errors = $this->validate($data);
+        $errors   = $this->validate($data);
+        $result   = null;
+        $aiAdvice = null;
 
         if (!empty($errors)) {
-            return [$data, $errors, null];
+            return [$data, $errors, null, null];
         }
 
         try {
@@ -47,12 +51,18 @@ final class LightingController
                 windows:       $data['windows'],
             );
 
+            // 1. Cálculo matemático determinista (UNE-EN 12464-1)
             $result = (new CalculateLightingUseCase())->execute($room);
+
+            // 2. Asesoría de diseño por IA (Gemini 3.8 Flash) — Opcional / Silenciosa si falla
+            $advisor = new GeminiInteriorAdvisor();
+            $aiAdvice = $advisor->getAdvice($room, $result);
+
         } catch (\InvalidArgumentException $e) {
             $errors['general'] = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
         }
 
-        return [$data, $errors, $result];
+        return [$data, $errors, $result, $aiAdvice];
     }
 
     private function validate(array $data): array
@@ -84,4 +94,3 @@ final class LightingController
         return $errors;
     }
 }
-
