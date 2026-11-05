@@ -49,6 +49,8 @@
 
 </div>
 
+<?php require __DIR__ . '/copilot.php'; ?>
+
 <script src="js/app.js"></script>
 </body>
 </html>

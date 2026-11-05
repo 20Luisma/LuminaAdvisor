@@ -59,3 +59,4 @@ final class ChatController
         ], JSON_UNESCAPED_UNICODE);
     }
 }
+

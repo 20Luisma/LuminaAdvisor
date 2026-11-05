@@ -1,56 +1,53 @@
 /**
- * LuminaAdvisor — Wizard JS & Chat Interactivo
- * Maneja la navegación por pasos, validación client-side, animación y chat con IA.
+ * LuminaAdvisor — Wizard JS & Copiloto IA (Lumina)
+ * Maneja wizard, animaciones de números y drawer flotante de Copiloto IA.
  */
 
 (function () {
   'use strict';
 
-  // ── Estado del wizard ──────────────────────────────────────────
+  // ── Estado Global ──────────────────────────────────────────────
   const state = {
     currentStep: 1,
     totalSteps: 2,
     chatHistory: [],
     isSendingChat: false,
+    drawerOpen: false,
   };
 
-  // ── Refs ───────────────────────────────────────────────────────
-  const steps           = document.querySelectorAll('.wizard-step');
-  const progressBubbles = document.querySelectorAll('.progress-step');
-  const progressLines   = document.querySelectorAll('.progress-line');
+  // ── Inicialización ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    initWizard();
+    initNumbersAnimation();
+    initCopilotDrawer();
+  });
 
-  // ── Init ───────────────────────────────────────────────────────
-  function init() {
-    if (steps.length > 0) {
-      renderStep(state.currentStep);
+  // ── Wizard Form ────────────────────────────────────────────────
+  function initWizard() {
+    const steps = document.querySelectorAll('.wizard-step');
+    if (!steps.length) return;
 
-      // Botones de navegación
-      document.querySelectorAll('[data-action="next"]').forEach(btn => {
-        btn.addEventListener('click', goNext);
+    renderStep(state.currentStep);
+
+    document.querySelectorAll('[data-action="next"]').forEach(btn => {
+      btn.addEventListener('click', goNext);
+    });
+    document.querySelectorAll('[data-action="prev"]').forEach(btn => {
+      btn.addEventListener('click', goPrev);
+    });
+
+    document.querySelectorAll('.room-option input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        setTimeout(() => goNext(), 300);
       });
-      document.querySelectorAll('[data-action="prev"]').forEach(btn => {
-        btn.addEventListener('click', goPrev);
-      });
+    });
 
-      // Room cards — auto-avanzar al seleccionar
-      document.querySelectorAll('.room-option input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-          setTimeout(() => goNext(), 300);
-        });
-      });
-
-      // Submit con loading state
-      const form = document.getElementById('lighting-form');
-      if (form) {
-        form.addEventListener('submit', onFormSubmit);
-      }
+    const form = document.getElementById('lighting-form');
+    if (form) {
+      form.addEventListener('submit', onFormSubmit);
     }
-
-    // Inicializar chat si estamos en la vista de resultados
-    initChat();
   }
 
-  // ── Navegación ─────────────────────────────────────────────────
   function goNext() {
     if (!validateStep(state.currentStep)) return;
     if (state.currentStep < state.totalSteps) {
@@ -69,6 +66,10 @@
   }
 
   function renderStep(step) {
+    const steps           = document.querySelectorAll('.wizard-step');
+    const progressBubbles = document.querySelectorAll('.progress-step');
+    const progressLines   = document.querySelectorAll('.progress-line');
+
     steps.forEach((el, idx) => {
       el.classList.toggle('active', idx + 1 === step);
     });
@@ -84,7 +85,6 @@
     });
   }
 
-  // ── Validación por paso ────────────────────────────────────────
   function validateStep(step) {
     clearErrors();
 
@@ -129,7 +129,6 @@
     return true;
   }
 
-  // ── Errores ────────────────────────────────────────────────────
   function showError(id, message) {
     const el = document.getElementById(id);
     if (el) {
@@ -145,7 +144,6 @@
     });
   }
 
-  // ── Submit ─────────────────────────────────────────────────────
   function onFormSubmit(e) {
     if (!validateStep(state.currentStep)) {
       e.preventDefault();
@@ -155,14 +153,13 @@
     if (btn) btn.classList.add('btn-loading');
   }
 
-  // ── Scroll suave al wizard ─────────────────────────────────────
   function scrollToWizard() {
     const el = document.querySelector('.wizard-progress');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  // ── Animación de números en resultado ─────────────────────────
-  function animateNumbers() {
+  // ── Números Animados ───────────────────────────────────────────
+  function initNumbersAnimation() {
     document.querySelectorAll('[data-count]').forEach(el => {
       const target   = parseInt(el.dataset.count, 10);
       const decimals = parseInt(el.dataset.decimals ?? '0', 10);
@@ -184,57 +181,131 @@
     });
   }
 
-  // ── Chat Interactivo con el Asesor (Lumina) ───────────────────
-  function initChat() {
-    const chatForm     = document.getElementById('chat-form');
-    const chatInput    = document.getElementById('chat-input');
-    const chatMessages = document.getElementById('chat-messages');
-    const contextEl    = document.getElementById('room-context-data');
+  // ── Copiloto Flotante (Drawer & Chat) ──────────────────────────
+  function initCopilotDrawer() {
+    const fab           = document.getElementById('openCopilotBtn');
+    const overlay       = document.getElementById('copilotDrawerOverlay');
+    const closeBtn      = document.getElementById('closeCopilotBtn');
+    const clearBtn      = document.getElementById('copilotClearBtn');
+    const form          = document.getElementById('copilotForm');
+    const input         = document.getElementById('copilotInput');
+    const messages      = document.getElementById('copilotMessages');
+    const calloutBtn    = document.getElementById('btnOpenCopilotFromCallout');
 
-    if (!chatForm || !chatInput || !chatMessages || !contextEl) return;
+    if (!overlay) return;
 
-    let roomContext = {};
-    try {
-      roomContext = JSON.parse(contextEl.textContent);
-    } catch (err) {
-      console.error('Error parseando contexto de habitación:', err);
+    // Abrir Drawer
+    function openDrawer() {
+      overlay.classList.add('open');
+      state.drawerOpen = true;
+      setTimeout(() => input?.focus(), 300);
+      updateGreetingWithContext();
     }
 
-    // Chips de preguntas sugeridas
-    document.querySelectorAll('.chat-chip').forEach(chip => {
+    // Cerrar Drawer
+    function closeDrawer() {
+      overlay.classList.remove('open');
+      state.drawerOpen = false;
+    }
+
+    if (fab) fab.addEventListener('click', openDrawer);
+    if (calloutBtn) calloutBtn.addEventListener('click', openDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+    // Cerrar haciendo clic fuera del drawer
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closeDrawer();
+    });
+
+    // Tecla ESC para cerrar
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && state.drawerOpen) closeDrawer();
+    });
+
+    // Limpiar chat
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => {
+        state.chatHistory = [];
+        messages.innerHTML = '';
+        updateGreetingWithContext(true);
+      });
+    }
+
+    // Chips de preguntas rápidas
+    document.querySelectorAll('.copilot-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         const q = chip.dataset.question;
         if (q && !state.isSendingChat) {
-          chatInput.value = q;
-          sendChatMessage(q, roomContext, chatMessages, chatInput);
+          input.value = q;
+          sendMessage(q, messages, input);
         }
       });
     });
 
-    // Envío por formulario
-    chatForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const text = chatInput.value.trim();
-      if (!text || state.isSendingChat) return;
-      sendChatMessage(text, roomContext, chatMessages, chatInput);
-    });
+    // Enviar mensaje
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = input.value.trim();
+        if (!text || state.isSendingChat) return;
+        sendMessage(text, messages, input);
+      });
+    }
   }
 
-  function sendChatMessage(text, context, messagesContainer, inputEl) {
+  function getRoomContext() {
+    const contextEl = document.getElementById('room-context-data');
+    if (contextEl) {
+      try {
+        return JSON.parse(contextEl.textContent);
+      } catch (err) {
+        console.error('Error parseando contexto:', err);
+      }
+    }
+    // Contexto genérico si aún no calcularon
+    return {
+      type: 'hogar',
+      square_meters: 15,
+      ceiling_height: 2.5,
+      wall_color: 'blanco',
+      windows: 'mediana',
+      total_lumens: 3000,
+      light_points: 3,
+      color_temperature_k: 3000,
+      color_category: 'cálida',
+    };
+  }
+
+  function updateGreetingWithContext(force = false) {
+    const messages = document.getElementById('copilotMessages');
+    const ctx = getRoomContext();
+
+    if (!messages) return;
+
+    // Solo actualizar si está vacío o si es forzado por "limpiar"
+    if (messages.children.length === 0 || force) {
+      const greeting = ctx.type && ctx.type !== 'hogar'
+        ? `¡Hola! Soy <strong>Lumina</strong>. Ya tengo cargados los datos de tu <strong>${escapeHtml(ctx.type)} de ${ctx.square_meters} m²</strong> con sus <strong>${ctx.light_points} puntos de luz recomendados</strong>.<br><br>¿Qué duda te quedó sobre la instalación o qué bombilla comprar? Decime y te lo explico sin rodeos.`
+        : `¡Hola! Soy <strong>Lumina</strong>, tu asesora de iluminación para el hogar.<br><br>Podés preguntarme lo que quieras sobre cómo calcular tus focos, qué bombillas pedir en la ferretería o cómo elegir luz cálida o neutra.`;
+
+      appendBubble(messages, greeting, 'bot');
+    }
+  }
+
+  function sendMessage(text, messagesContainer, inputEl) {
     state.isSendingChat = true;
     inputEl.value = '';
 
-    // Agregar mensaje del usuario en UI
+    // Burbuja del usuario
     appendBubble(messagesContainer, text, 'user');
 
-    // Agregar indicador de "escribiendo..."
-    const typingBubble = appendBubble(messagesContainer, 'Pensando una respuesta clara...', 'bot', true);
+    // Burbuja pensando
+    const typingBubble = appendBubble(messagesContainer, 'Pensando una respuesta clara y práctica...', 'bot', true);
 
-    // Preparar payload
     const payload = {
       message: text,
-      context: context,
-      history: state.chatHistory.slice(-6), // últimos 6 mensajes de memoria
+      context: getRoomContext(),
+      history: state.chatHistory.slice(-6),
     };
 
     fetch('index.php?action=chat', {
@@ -247,7 +318,6 @@
         typingBubble.remove();
         if (data.ok && data.reply) {
           appendBubble(messagesContainer, data.reply, 'bot');
-          // Guardar en historial
           state.chatHistory.push({ role: 'user', text: text });
           state.chatHistory.push({ role: 'model', text: data.reply });
         } else {
@@ -257,7 +327,7 @@
       .catch(err => {
         typingBubble.remove();
         console.error('Error en fetch chat:', err);
-        appendBubble(messagesContainer, 'Hubo un error de conexión con el asesor. Verificá tu red y probá de nuevo.', 'bot');
+        appendBubble(messagesContainer, 'Hubo un error de conexión con la asesora. Probá de nuevo en unos segundos.', 'bot');
       })
       .finally(() => {
         state.isSendingChat = false;
@@ -267,15 +337,16 @@
 
   function appendBubble(container, text, role, isTyping = false) {
     const msgDiv = document.createElement('div');
-    msgDiv.className = `chat-msg chat-msg-${role}`;
+    msgDiv.className = `copilot-msg copilot-msg-${role}`;
     if (isTyping) msgDiv.style.opacity = '0.7';
 
     const bubble = document.createElement('div');
-    bubble.className = 'chat-bubble';
+    bubble.className = 'copilot-bubble';
 
-    // Parse simple markdown-like newlines or bold
-    const formatted = escapeHtml(text).replace(/\n/g, '<br>');
-    bubble.innerHTML = formatted;
+    // Parse simple newlines or HTML
+    bubble.innerHTML = text.includes('<br>') || text.includes('<strong>') || text.includes('<ul>')
+      ? text
+      : escapeHtml(text).replace(/\n/g, '<br>');
 
     msgDiv.appendChild(bubble);
     container.appendChild(msgDiv);
@@ -288,13 +359,5 @@
     div.textContent = str;
     return div.innerHTML;
   }
-
-  // ── Arranque ───────────────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
-    init();
-    if (document.querySelector('[data-count]')) {
-      animateNumbers();
-    }
-  });
 
 })();
