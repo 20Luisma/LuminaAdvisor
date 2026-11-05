@@ -67,7 +67,7 @@ LuminaAdvisor/
 - [x] Calcular consumo €/mes y kWh/mes del setup
 - [x] Repositorio GitHub conectado y sincronizado (`20Luisma/LuminaAdvisor`)
 - [x] Despliegue en producción Hostinger activo (`contenido.creawebes.com/LuminaAdvisor/`)
-- [ ] Posible integración opcional con IA (Gemini) para consejos de estilismo/interiorismo
+- [x] Integración con IA: Asesor de Interiorismo con Google Gemini 3.8 Flash (distribución espacial, capas de luz, consejos pro con JSON estructurado)
 
 ---
 
@@ -120,12 +120,14 @@ Temperatura de color por uso:
 
 ## 🕰️ Historial de Sesiones
 
-### 2026-11-05 (Sesión 2 — MVP Completo y Deploy Producción)
+### 2026-11-05 (Sesión 2 — MVP Completo, Deploy Producción e Integración IA)
 - Implementación de entidades: `Room.php` y `LightRecommendation.php`.
 - Caso de uso `CalculateLightingUseCase.php` con física exacta UNE-EN 12464-1 (cero alucinaciones).
 - Interfaz completa: Front Controller `index.php`, `LightingController.php`, wizard de 2 pasos, glassmorphism con acento ámbar (`style.css`), animaciones de contadores (`app.js`).
 - Configuración de Apache: `index.php` raíz y `.htaccess` con rewrite a `public/`.
 - Pipeline de deploy: `bin/deploy.sh` blindado (lee credenciales de `.env` ignorado en git).
+- Integración con IA: `GeminiInteriorAdvisor.php` consumiendo API de Google Gemini 3.8 Flash (`responseMimeType: application/json`, `thinkingBudget: 0` para latencia < 2s).
+- Tarjeta de Interiorismo en UI con distribución en el espacio, capas de luz y consejos pro.
 - Despliegue completado y verificado en Hostinger: `https://contenido.creawebes.com/LuminaAdvisor/` (HTTP 200).
 
 ### 2026-11-04 (Sesión 1 — Bootstrap)
