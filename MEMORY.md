@@ -111,12 +111,10 @@ Temperatura de color por uso:
 
 ## 🚀 Próximos Pasos Prioritarios
 
-1. Crear entidad `Room.php` y `LightRecommendation.php`
-2. Implementar `CalculateLightingUseCase.php`
-3. Diseñar UI formulario paso a paso (wizard de 3 pasos)
-4. Implementar resultado visual con recomendación clara
-5. Primer commit + push a GitHub
-6. Deploy a Hostinger
+1. Posible análisis multimodal de fotos con Gemini Vision (cargar foto de la habitación para autocompletar wizard).
+2. Generador de lista de compras / shopping list con enlaces o marcas recomendadas.
+3. Soporte PWA / Web App instalable para móviles.
+4. Exportar informe en PDF con cálculo normativo y croquis 2D.
 
 ---
 
