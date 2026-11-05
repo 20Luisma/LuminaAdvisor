@@ -9,8 +9,7 @@ use LuminaAdvisor\Domain\Entities\Room;
 
 /**
  * Servicio de Asesoría de Interiorismo por IA (Google Gemini 3.8 Flash).
- * Agrega valor cualitativo y de diseño sobre el cálculo matemático.
- * Blindado con fallback silencioso: si falla la API, la app nunca se rompe.
+ * Enfoque: Lenguaje 100% terrenal, humano, práctico y cero jerga técnica.
  */
 final class GeminiInteriorAdvisor
 {
@@ -24,8 +23,7 @@ final class GeminiInteriorAdvisor
     }
 
     /**
-     * Genera 3 consejos de interiorismo y distribución en formato array estructurado.
-     * Retorna null si no hay API key o si ocurre cualquier error de red/cuota.
+     * Genera 3 consejos de diseño en lenguaje claro y accesible.
      */
     public function getAdvice(Room $room, LightRecommendation $recommendation): ?array
     {
@@ -33,62 +31,133 @@ final class GeminiInteriorAdvisor
             return null;
         }
 
-        $prompt = $this->buildPrompt($room, $recommendation);
+        $prompt = $this->buildAdvicePrompt($room, $recommendation);
 
         try {
             $response = $this->callGemini($prompt);
-            return $this->parseResponse($response);
+            return $this->parseAdviceResponse($response);
         } catch (\Throwable $e) {
-            // Silencioso por diseño: la física matemática es prioritaria
             error_log("GeminiInteriorAdvisor Error: " . $e->getMessage());
             return null;
         }
     }
 
-    private function buildPrompt(Room $room, LightRecommendation $rec): string
+    /**
+     * Responde preguntas del usuario en el chat conversacional.
+     */
+    public function chat(string $userMessage, array $roomContext, array $history = []): string
+    {
+        if (empty($this->apiKey)) {
+            return "Lo siento, la conexión con el asesor de IA no está configurada.";
+        }
+
+        $systemInstruction = <<<SYS
+Eres Lumina, una asesora experta y cercana en iluminación y diseño de interiores para el hogar.
+El usuario acaba de calcular la iluminación de su habitación con estos datos exactos:
+- Habitación: {$roomContext['type']}
+- Tamaño: {$roomContext['square_meters']} m²
+- Altura del techo: {$roomContext['ceiling_height']} m
+- Color de paredes: {$roomContext['wall_color']}
+- Ventanas / luz natural: {$roomContext['windows']}
+- Lúmenes calculados: {$roomContext['total_lumens']} lm ({$roomContext['light_points']} puntos de luz)
+- Temperatura de color: {$roomContext['color_temperature_k']}K ({$roomContext['color_category']})
+
+REGLAS DE ORO:
+1. Habla en un español natural, cercano, cálido y 100% práctico (como un amigo arquitecto explicándole a alguien en su casa).
+2. NUNCA uses tecnicismos oscuros (prohibido decir UGR, R9, cenital, lux, o lúmenes sin explicar). Explica con cosas tangibles: "un foco empotrado", "una tira LED oculta", "luz cálida para relajar".
+3. Da respuestas concisas (máximo 2 párrafos cortos o una lista con viñetas claras).
+4. Si te preguntan por compras o qué pedir en la tienda, dale especificaciones prácticas que cualquier empleado de ferretería o Leroy Merlin entienda (tipo de casquillo, potencia en vatios LED equivalente, color de luz).
+SYS;
+
+        // Construir contenido para Gemini
+        $contents = [];
+
+        // Historial previo
+        foreach ($history as $msg) {
+            $role = ($msg['role'] === 'user') ? 'user' : 'model';
+            $contents[] = [
+                'role'  => $role,
+                'parts' => [['text' => (string) $msg['text']]],
+            ];
+        }
+
+        // Mensaje actual del usuario
+        $contents[] = [
+            'role'  => 'user',
+            'parts' => [['text' => $userMessage]],
+        ];
+
+        $payload = [
+            'systemInstruction' => [
+                'parts' => [['text' => $systemInstruction]]
+            ],
+            'contents' => $contents,
+            'generationConfig' => [
+                'temperature'     => 0.5,
+                'maxOutputTokens' => 600,
+                'thinkingConfig'  => ['thinkingBudget' => 0],
+            ],
+        ];
+
+        try {
+            $result = $this->sendRawRequest($payload);
+            $data   = json_decode($result, true);
+            return (string) ($data['candidates'][0]['content']['parts'][0]['text'] ?? 'No pude procesar la respuesta en este momento.');
+        } catch (\Throwable $e) {
+            error_log("Gemini Chat Error: " . $e->getMessage());
+            return "Hubo un pequeño corte en la comunicación con el asesor. Probá de nuevo en unos segundos.";
+        }
+    }
+
+    private function buildAdvicePrompt(Room $room, LightRecommendation $rec): string
     {
         return <<<PROMPT
-Actúa como un diseñador de interiores y arquitecto lumínico de alto nivel.
-Se han calculado los requerimientos de iluminación basados en la norma UNE-EN 12464-1 para esta habitación:
-
-- Habitación: {$room->getType()}
-- Superficie: {$room->getSquareMeters()} m²
-- Altura del techo: {$room->getCeilingHeight()} m
-- Color de paredes: {$room->getWallColor()}
+Actúa como una diseñadora de interiores profesional que habla con un cliente de forma súper clara, cercana y práctica.
+Datos de la habitación calculada:
+- Tipo: {$room->getType()}
+- Superficie: {$room->getSquareMeters()} m² (Altura: {$room->getCeilingHeight()} m)
+- Paredes: color {$room->getWallColor()}
 - Luz natural: {$room->getWindows()}
-- Lúmenes totales calculados: {$rec->getTotalLumens()} lm
-- Puntos de luz sugeridos: {$rec->getLightPoints()}
-- Temperatura sugerida: {$rec->getColorTemperatureK()}K ({$rec->getColorCategory()})
+- Setup recomendado: {$rec->getTotalLumens()} lúmenes repartidos en {$rec->getLightPoints()} puntos de luz a {$rec->getColorTemperatureK()}K ({$rec->getColorCategory()}).
 
-Tu misión: Da exactamente 3 recomendaciones concretas y de buen gusto sobre diseño, ubicación física de las luminarias y ambiente.
-Responde un JSON con exactamente estas 3 claves:
-- "distribucion": Dónde ubicar los puntos en el espacio (focos empotrados, lámpara suspendida, perimetral, distancias).
-- "estilo_ambiente": Cómo crear capas de luz (luz indirecta, tiras LED ocultas, lámparas de apoyo, regulación dimmer).
-- "consejo_pro": Un consejo profesional o detalle de confort visual (CRI > 90, evitar deslumbramientos, efecto del color de pared).
+Misión: Escribe 3 recomendaciones de buen gusto para que la persona sepa EXACTAMENTE dónde poner las luces y cómo ambientar su espacio.
+
+REGLAS CRÍTICAS DE LENGUAJE:
+- Habla en español llano y terrenal.
+- PROHIBIDO TERMINANTEMENTE usar jerga incomprensible: NO uses 'cenital', NO uses 'UGR < 19', NO uses 'R9 > 50', NO uses 'deslumbramiento supino', NO uses fórmulas.
+- Habla como una persona normal: "colocá el foco en el techo sobre la ducha", "poné una luz frontal en el espejo para que no te haga sombras en la cara al afeitarte o maquillarte", "usá un regulador para bajar la luz de noche".
+
+Responde en formato JSON con exactamente estas 3 claves:
+{
+  "distribucion": "Dónde colocar físicamente los puntos en la habitación con distancias o referencias simples y claras.",
+  "estilo_ambiente": "Cómo combinar las luces para crear un ambiente cómodo (luz principal en el techo, luz puntual de lectura o espejo, etc.).",
+  "consejo_pro": "Un consejo práctico para cuando vaya a comprar o instalar (ej: evitar sombras, color de bombilla adecuado, protección contra humedad si es baño, etc.)."
+}
 PROMPT;
     }
 
     private function callGemini(string $prompt): string
     {
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
-
         $payload = [
             'contents' => [
                 [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
+                    'parts' => [['text' => $prompt]]
                 ]
             ],
             'generationConfig' => [
                 'responseMimeType' => 'application/json',
                 'temperature'      => 0.3,
                 'maxOutputTokens'  => 600,
-                'thinkingConfig'   => [
-                    'thinkingBudget' => 0
-                ]
+                'thinkingConfig'   => ['thinkingBudget' => 0],
             ]
         ];
+
+        return $this->sendRawRequest($payload);
+    }
+
+    private function sendRawRequest(array $payload): string
+    {
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
 
         $ch = curl_init($url);
         curl_setopt_array($ch, [
@@ -113,7 +182,7 @@ PROMPT;
         return (string) $result;
     }
 
-    private function parseResponse(string $json): ?array
+    private function parseAdviceResponse(string $json): ?array
     {
         $data = json_decode($json, true);
         $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;

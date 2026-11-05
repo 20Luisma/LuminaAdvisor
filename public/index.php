@@ -26,6 +26,14 @@ if (file_exists($envFile)) {
 
 require_once __DIR__ . '/../src/Autoloader.php';
 
+use LuminaAdvisor\Presentation\Controllers\ChatController;
 use LuminaAdvisor\Presentation\Controllers\LightingController;
+
+$action = $_GET['action'] ?? '';
+
+if ($action === 'chat') {
+    (new ChatController())->handle();
+    exit;
+}
 
 (new LightingController())->handle();

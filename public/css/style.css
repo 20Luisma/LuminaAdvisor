@@ -845,3 +845,294 @@ h1, h2, h3, h4 {
   color: var(--text-secondary);
   line-height: 1.5;
 }
+
+/* ── 22. Blueprint 2D Visual Map ─────────────────────────────── */
+.blueprint-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.blueprint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blueprint-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blueprint-title h4 {
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.blueprint-legend {
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: var(--accent-glow);
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.blueprint-canvas {
+  position: relative;
+  background: radial-gradient(circle at 50% 50%, #151522 0%, #0d0d14 100%);
+  border: 2px dashed rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-lg);
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  overflow: hidden;
+}
+
+.blueprint-wall-top {
+  position: absolute;
+  top: 8px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.blueprint-door {
+  position: absolute;
+  bottom: 8px;
+  left: 20px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.blueprint-lights-grid {
+  display: grid;
+  width: 100%;
+  max-width: 480px;
+  gap: 20px;
+  justify-items: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.blueprint-lights-grid.points-1 { grid-template-columns: 1fr; }
+.blueprint-lights-grid.points-2 { grid-template-columns: 1fr 1fr; }
+.blueprint-lights-grid.points-3 { grid-template-columns: 1fr 1fr 1fr; }
+.blueprint-lights-grid.points-4 { grid-template-columns: 1fr 1fr; }
+.blueprint-lights-grid.points-5 { grid-template-columns: 1fr 1fr 1fr; }
+.blueprint-lights-grid.points-6 { grid-template-columns: 1fr 1fr 1fr; }
+.blueprint-lights-grid.points-7 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.blueprint-lights-grid.points-8 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.blueprint-light-spot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.light-halo {
+  position: absolute;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.45) 0%, rgba(245, 158, 11, 0) 70%);
+  top: -8px;
+  animation: pulseLight 3s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes pulseLight {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(1.25); opacity: 1; }
+}
+
+.light-bulb {
+  font-size: 1.5rem;
+  position: relative;
+  z-index: 2;
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
+}
+
+.light-spot-tag {
+  font-size: 0.68rem;
+  color: var(--accent-light);
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.blueprint-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ── 23. Interactive Chat with Lumina ────────────────────────── */
+.chat-advisor-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.chat-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 0 16px var(--accent-glow-strong);
+}
+
+.chat-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chat-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.chat-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.chat-chip {
+  background: var(--glass-bg);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--accent-light);
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chat-chip:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.chat-messages {
+  max-height: 340px;
+  min-height: 140px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 6px;
+  margin-bottom: 16px;
+  scroll-behavior: smooth;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 4px;
+}
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 4px;
+}
+
+.chat-msg {
+  display: flex;
+  gap: 10px;
+  max-width: 85%;
+}
+
+.chat-msg-bot {
+  align-self: flex-start;
+}
+
+.chat-msg-user {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+}
+
+.chat-bubble {
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.chat-msg-bot .chat-bubble {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  border-bottom-left-radius: 4px;
+}
+
+.chat-msg-user .chat-bubble {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: #000;
+  font-weight: 500;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.chat-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.chat-send-btn {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+}
