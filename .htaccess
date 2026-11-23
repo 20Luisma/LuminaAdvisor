@@ -1,5 +1,19 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteRule ^((?!public).*)$ public/$1 [L,NC]
+# Endurecimiento de seguridad HTTP y ruteo limpio — LuminaAdvisor
+Options -Indexes
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+# Bloquear acceso web directo a archivos sensibles y directorios internos
+<FilesMatch "(^\.env|\.neon$|\.xml$|\.lock$|\.md$|composer\.json|package\.json)">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(src|templates|storage|vendor|tests|docs|bin|memory_backups|\.git|\.github)/ - [F,L,NC]
+    RewriteRule ^((?!public).*)$ public/$1 [L,NC]
+</IfModule>

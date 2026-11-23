@@ -6,6 +6,7 @@ namespace LuminaAdvisor\Infrastructure\AI;
 
 use LuminaAdvisor\Domain\Entities\LightRecommendation;
 use LuminaAdvisor\Domain\Entities\Room;
+use LuminaAdvisor\Infrastructure\Observability\ErrorLogger;
 
 /**
  * Servicio de Asesoría de Interiorismo por IA (Google Gemini 3.8 Flash).
@@ -15,19 +16,33 @@ final class GeminiInteriorAdvisor
 {
     private string $apiKey;
     private string $model;
+    /** @var callable(array<string, mixed>): string|null */
+    private $httpTransport;
+    private ErrorLogger $logger;
 
-    public function __construct(?string $apiKey = null, string $model = 'gemini-3.8-flash')
-    {
-        $this->apiKey = $apiKey ?? (string) ($_ENV['GEMINI_API_KEY'] ?? getenv('GEMINI_API_KEY') ?: '');
-        $this->model  = $model;
+    /**
+     * @param callable(array<string, mixed>): string|null $httpTransport Transporte inyectable para tests aislados sin red.
+     */
+    public function __construct(
+        ?string $apiKey = null,
+        string $model = 'gemini-3.8-flash',
+        ?callable $httpTransport = null,
+        ?ErrorLogger $logger = null,
+    ) {
+        $this->apiKey        = $apiKey ?? (string) ($_ENV['GEMINI_API_KEY'] ?? getenv('GEMINI_API_KEY') ?: '');
+        $this->model         = $model;
+        $this->httpTransport = $httpTransport;
+        $this->logger        = $logger ?? new ErrorLogger();
     }
 
     /**
      * Genera 3 consejos de diseño en lenguaje claro y accesible.
+     *
+     * @return array{distribucion: string, estilo_ambiente: string, consejo_pro: string}|null
      */
     public function getAdvice(Room $room, LightRecommendation $recommendation): ?array
     {
-        if (empty($this->apiKey)) {
+        if ($this->apiKey === '') {
             return null;
         }
 
@@ -37,30 +52,45 @@ final class GeminiInteriorAdvisor
             $response = $this->callGemini($prompt);
             return $this->parseAdviceResponse($response);
         } catch (\Throwable $e) {
-            error_log("GeminiInteriorAdvisor Error: " . $e->getMessage());
+            $this->logger->log('warning', 'GeminiInteriorAdvisor fallback activado', [
+                'error' => $e->getMessage(),
+            ]);
             return null;
         }
     }
 
     /**
      * Responde preguntas del usuario en el chat conversacional.
+     *
+     * @param array<string, mixed>                   $roomContext
+     * @param array<int, array<string, mixed>>       $history
      */
     public function chat(string $userMessage, array $roomContext, array $history = []): string
     {
-        if (empty($this->apiKey)) {
-            return "Lo siento, la conexión con el asesor de IA no está configurada.";
+        if ($this->apiKey === '') {
+            return 'Lo siento, la conexión con el asesor de IA no está configurada.';
         }
+
+        $type     = (string) ($roomContext['type'] ?? 'habitación');
+        $m2       = (string) ($roomContext['square_meters'] ?? '15');
+        $height   = (string) ($roomContext['ceiling_height'] ?? '2.5');
+        $wall     = (string) ($roomContext['wall_color'] ?? 'blanco');
+        $windows  = (string) ($roomContext['windows'] ?? 'mediana');
+        $lumens   = (string) ($roomContext['total_lumens'] ?? '2000');
+        $points   = (string) ($roomContext['light_points'] ?? '2');
+        $kelvin   = (string) ($roomContext['color_temperature_k'] ?? '3000');
+        $category = (string) ($roomContext['color_category'] ?? 'cálida');
 
         $systemInstruction = <<<SYS
 Eres Lumina, una asesora experta y cercana en iluminación y diseño de interiores para el hogar.
 El usuario acaba de calcular la iluminación de su habitación con estos datos exactos:
-- Habitación: {$roomContext['type']}
-- Tamaño: {$roomContext['square_meters']} m²
-- Altura del techo: {$roomContext['ceiling_height']} m
-- Color de paredes: {$roomContext['wall_color']}
-- Ventanas / luz natural: {$roomContext['windows']}
-- Lúmenes calculados: {$roomContext['total_lumens']} lm ({$roomContext['light_points']} puntos de luz)
-- Temperatura de color: {$roomContext['color_temperature_k']}K ({$roomContext['color_category']})
+- Habitación: {$type}
+- Tamaño: {$m2} m²
+- Altura del techo: {$height} m
+- Color de paredes: {$wall}
+- Ventanas / luz natural: {$windows}
+- Lúmenes calculados: {$lumens} lm ({$points} puntos de luz)
+- Temperatura de color: {$kelvin}K ({$category})
 
 REGLAS DE ORO:
 1. Habla en un español natural, cercano, cálido y 100% práctico (como un amigo arquitecto explicándole a alguien en su casa).
@@ -69,19 +99,16 @@ REGLAS DE ORO:
 4. Si te preguntan por compras o qué pedir en la tienda, dale especificaciones prácticas que cualquier empleado de ferretería o Leroy Merlin entienda (tipo de casquillo, potencia en vatios LED equivalente, color de luz).
 SYS;
 
-        // Construir contenido para Gemini
         $contents = [];
 
-        // Historial previo
         foreach ($history as $msg) {
-            $role = ($msg['role'] === 'user') ? 'user' : 'model';
+            $role       = (($msg['role'] ?? '') === 'user') ? 'user' : 'model';
             $contents[] = [
                 'role'  => $role,
-                'parts' => [['text' => (string) $msg['text']]],
+                'parts' => [['text' => (string) ($msg['text'] ?? '')]],
             ];
         }
 
-        // Mensaje actual del usuario
         $contents[] = [
             'role'  => 'user',
             'parts' => [['text' => $userMessage]],
@@ -89,9 +116,9 @@ SYS;
 
         $payload = [
             'systemInstruction' => [
-                'parts' => [['text' => $systemInstruction]]
+                'parts' => [['text' => $systemInstruction]],
             ],
-            'contents' => $contents,
+            'contents'         => $contents,
             'generationConfig' => [
                 'temperature'     => 0.5,
                 'maxOutputTokens' => 600,
@@ -102,10 +129,16 @@ SYS;
         try {
             $result = $this->sendRawRequest($payload);
             $data   = json_decode($result, true);
-            return (string) ($data['candidates'][0]['content']['parts'][0]['text'] ?? 'No pude procesar la respuesta en este momento.');
+            if (!is_array($data)) {
+                return 'No pude procesar la respuesta en este momento.';
+            }
+            $reply = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+            return is_string($reply) && $reply !== '' ? $reply : 'No pude procesar la respuesta en este momento.';
         } catch (\Throwable $e) {
-            error_log("Gemini Chat Error: " . $e->getMessage());
-            return "Hubo un pequeño corte en la comunicación con el asesor. Probá de nuevo en unos segundos.";
+            $this->logger->log('warning', 'Gemini Chat fallback activado', [
+                'error' => $e->getMessage(),
+            ]);
+            return 'Hubo un pequeño corte en la comunicación con el asesor. Probá de nuevo en unos segundos.';
         }
     }
 
@@ -141,53 +174,74 @@ PROMPT;
         $payload = [
             'contents' => [
                 [
-                    'parts' => [['text' => $prompt]]
-                ]
+                    'parts' => [['text' => $prompt]],
+                ],
             ],
             'generationConfig' => [
                 'responseMimeType' => 'application/json',
                 'temperature'      => 0.3,
                 'maxOutputTokens'  => 600,
                 'thinkingConfig'   => ['thinkingBudget' => 0],
-            ]
+            ],
         ];
 
         return $this->sendRawRequest($payload);
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
     private function sendRawRequest(array $payload): string
     {
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
+        if ($this->httpTransport !== null) {
+            return ($this->httpTransport)($payload);
+        }
+
+        $url  = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent?key={$this->apiKey}";
+        $body = json_encode($payload);
+        if ($body === false) {
+            throw new \RuntimeException('No se pudo serializar el payload JSON para Gemini.');
+        }
 
         $ch = curl_init($url);
+        if ($ch === false) {
+            throw new \RuntimeException('No se pudo inicializar cURL.');
+        }
+
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-            CURLOPT_POSTFIELDS     => json_encode($payload),
+            CURLOPT_POSTFIELDS     => $body,
             CURLOPT_TIMEOUT        => 12,
             CURLOPT_CONNECTTIMEOUT => 4,
             CURLOPT_SSL_VERIFYPEER => true,
         ]);
 
         $result   = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error    = curl_error($ch);
         curl_close($ch);
 
-        if ($error !== '' || $httpCode !== 200 || !$result) {
+        if ($error !== '' || $httpCode !== 200 || !is_string($result) || $result === '') {
             throw new \RuntimeException("Error HTTP {$httpCode} al consultar Gemini: {$error}");
         }
 
-        return (string) $result;
+        return $result;
     }
 
+    /**
+     * @return array{distribucion: string, estilo_ambiente: string, consejo_pro: string}|null
+     */
     private function parseAdviceResponse(string $json): ?array
     {
         $data = json_decode($json, true);
-        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        if (!is_array($data)) {
+            return null;
+        }
 
-        if (!$text) {
+        $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+        if (!is_string($text) || $text === '') {
             return null;
         }
 
@@ -197,7 +251,7 @@ PROMPT;
         }
 
         return [
-            'distribucion'    => htmlspecialchars((string) ($parsed['distribucion'] ?? ''), ENT_QUOTES, 'UTF-8'),
+            'distribucion'    => htmlspecialchars((string) $parsed['distribucion'], ENT_QUOTES, 'UTF-8'),
             'estilo_ambiente' => htmlspecialchars((string) ($parsed['estilo_ambiente'] ?? ''), ENT_QUOTES, 'UTF-8'),
             'consejo_pro'     => htmlspecialchars((string) ($parsed['consejo_pro'] ?? ''), ENT_QUOTES, 'UTF-8'),
         ];

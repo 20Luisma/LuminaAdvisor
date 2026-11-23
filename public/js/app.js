@@ -99,13 +99,15 @@
     if (step === 2) {
       let valid = true;
 
-      const m2 = parseFloat(document.getElementById('square_meters')?.value ?? '');
+      const m2El = document.getElementById('square_meters');
+      const m2 = parseFloat(m2El instanceof HTMLInputElement ? m2El.value : '');
       if (!m2 || m2 <= 0 || m2 > 1000) {
         showError('error-m2', 'Ingresá los m² (entre 1 y 1000).');
         valid = false;
       }
 
-      const h = parseFloat(document.getElementById('ceiling_height')?.value ?? '');
+      const hEl = document.getElementById('ceiling_height');
+      const h = parseFloat(hEl instanceof HTMLInputElement ? hEl.value : '');
       if (!h || h < 2.0 || h > 10.0) {
         showError('error-height', 'Ingresá la altura (entre 2.0 y 10.0 m).');
         valid = false;
@@ -140,7 +142,9 @@
   function clearErrors() {
     document.querySelectorAll('.form-error').forEach(el => {
       el.textContent = '';
-      el.style.display = 'none';
+      if (el instanceof HTMLElement) {
+        el.style.display = 'none';
+      }
     });
   }
 
@@ -161,7 +165,8 @@
   // ── Números Animados ───────────────────────────────────────────
   function initNumbersAnimation() {
     document.querySelectorAll('[data-count]').forEach(el => {
-      const target   = parseInt(el.dataset.count, 10);
+      if (!(el instanceof HTMLElement)) return;
+      const target   = parseInt(el.dataset.count ?? '0', 10);
       const decimals = parseInt(el.dataset.decimals ?? '0', 10);
       const duration = 1200;
       const start    = performance.now();
@@ -240,6 +245,7 @@
     // Chips de preguntas rápidas
     document.querySelectorAll('.copilot-chip').forEach(chip => {
       chip.addEventListener('click', () => {
+        if (!(chip instanceof HTMLElement) || !(input instanceof HTMLInputElement)) return;
         const q = chip.dataset.question;
         if (q && !state.isSendingChat) {
           input.value = q;
@@ -252,6 +258,7 @@
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
+        if (!(input instanceof HTMLInputElement)) return;
         const text = input.value.trim();
         if (!text || state.isSendingChat) return;
         sendMessage(text, messages, input);

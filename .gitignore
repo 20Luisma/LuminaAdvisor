@@ -7,6 +7,12 @@
 vendor/
 node_modules/
 .cache/
+.phpunit.cache/
+
+# Reportes de cobertura y E2E
+coverage/
+playwright-report/
+test-results/
 
 # Sistema operativo
 .DS_Store
@@ -28,4 +34,3 @@ logs/
 # Backups de BD
 *.sql
 *.sql.gz
-

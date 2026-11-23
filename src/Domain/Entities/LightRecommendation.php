@@ -10,13 +10,6 @@ namespace LuminaAdvisor\Domain\Entities;
  */
 final class LightRecommendation
 {
-    // Tipos de luminaria recomendados por temperatura de color
-    private const LUMINAIRE_BY_KELVIN = [
-        'calida'   => 'LED integrado E27 (2700K–3000K) — Cálida / Relax',
-        'neutra'   => 'LED integrado GU10 (3500K–4000K) — Neutra / Funcional',
-        'fria'     => 'LED panel/downlight (4000K–5000K) — Fría / Concentración',
-    ];
-
     public function __construct(
         private readonly int    $totalLumens,         // Lúmenes totales necesarios
         private readonly int    $colorTemperatureK,   // Temperatura de color recomendada (K)
@@ -72,6 +65,17 @@ final class LightRecommendation
 
     /**
      * Serializa para la vista (array plano, sin lógica de presentación aquí).
+     *
+     * @return array{
+     *   total_lumens: int,
+     *   color_temperature_k: int,
+     *   light_points: int,
+     *   luminaire_type: string,
+     *   estimated_watts: float,
+     *   monthly_kwh: float,
+     *   monthly_cost_eur: float,
+     *   color_category: string
+     * }
      */
     public function toArray(): array
     {

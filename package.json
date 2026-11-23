@@ -1,0 +1,15 @@
+{
+  "name": "lumina-advisor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tooling de calidad, chequeo estatico JS y pruebas E2E Playwright para LuminaAdvisor.",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "composer test:coverage",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "typescript": "^5.9.3"
+  }
+}

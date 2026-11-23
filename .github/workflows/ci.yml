@@ -1,0 +1,62 @@
+name: CI — LuminaAdvisor (ITV 7/7)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gate:
+    name: Sintaxis, Tipos, Tests, Seguridad y E2E
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.4 con Xdebug
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: curl, json
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Validar composer.json (strict)
+        run: composer validate --strict
+
+      - name: Instalar dependencias PHP
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Instalar dependencias Node
+        run: npm ci
+
+      - name: Estación 1 — Sintaxis PHP y JS
+        run: |
+          composer lint
+          node --check public/js/app.js
+
+      - name: Estación 2 — Análisis Estático (PHPStan nivel 6 + TypeScript)
+        run: |
+          composer stan
+          npm run typecheck
+
+      - name: Estación 3 — Tests Unitarios y Cobertura (PHPUnit + Xdebug)
+        run: composer test:coverage
+
+      - name: Estación 4 — Auditoría de Seguridad (0 CVEs)
+        run: |
+          composer audit --no-interaction
+          npm audit --audit-level=moderate
+
+      - name: Estación 5 — Instalar Chromium y correr Playwright E2E
+        run: |
+          npx playwright install chromium --with-deps
+          npm run test:e2e

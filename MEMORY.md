@@ -70,6 +70,8 @@ LuminaAdvisor/
 - [x] Croquis visual 2D de distribución de puntos de luz en plano esquemático
 - [x] Copiloto IA flotante profesional (FAB fijo con pulso verde + Drawer lateral deslizable con backdrop blur)
 - [x] Tono de IA humanizado: lenguaje terrenal y práctico, chips de 1 clic y memoria de habitación
+- [x] Arnés de calidad ITV 7/7 en verde: PHPStan nivel 6, TypeScript `checkJs`, PHPUnit 11 + Xdebug (>75% cobertura), Playwright E2E, WCAG 2.1 AA, `ErrorLogger` fail-safe y CI en GitHub Actions
+- [x] Documentación completa: 4 ADRs en `docs/adr/` y `README.md` actualizado con badge CI y links de GitHub
 
 ---
 
@@ -119,6 +121,13 @@ Temperatura de color por uso:
 ---
 
 ## 🕰️ Historial de Sesiones
+
+### 2026-11-23 (Sesión 3 — ITV 7/7 en Verde, CI Real, ADRs y Observabilidad)
+- Instalado tooling de desarrollo real (excluido del deploy a Hostinger): PHPStan nivel 6 (`phpstan.neon`), PHPUnit 11 + Xdebug coverage (`phpunit.xml`), TypeScript `checkJs` (`tsconfig.json`) y Playwright E2E (`playwright.config.js`).
+- Implementado `ErrorLogger.php` fail-safe con `set_exception_handler`, logs JSON locales y soporte opcional `SENTRY_DSN`.
+- Refactorizado `templates/wizard.php` extrayendo `WizardViewData.php` y partials (`wizard_step1.php`, `wizard_step2.php`) con semántica WCAG 2.1 AA (`<fieldset>`, `<legend>`, `<label>`, `aria-label`).
+- Creados 20 tests unitarios aislados (76.55% cobertura real) + 4 tests E2E Playwright incluyendo caminos negativos HTTP 400/405/422.
+- Creado pipeline CI real en `.github/workflows/ci.yml`, ADRs 0002–0004 en `docs/adr/` y `README.md` completo con links GitHub y badge de CI.
 
 ### 2026-11-05 (Sesión 2 — MVP Completo, Deploy Producción, Croquis 2D y Chat con IA)
 - Implementación de entidades: `Room.php` y `LightRecommendation.php`.

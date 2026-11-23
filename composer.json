@@ -1,0 +1,33 @@
+{
+  "name": "luisma/lumina-advisor",
+  "description": "Asesor inteligente de iluminacion para el hogar basado en norma UNE-EN 12464-1 y Google Gemini Flash.",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.4"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "LuminaAdvisor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "LuminaAdvisor\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "lint": "find src public templates tests index.php -name '*.php' -exec php -l {} +",
+    "stan": "phpstan analyse --memory-limit=256M",
+    "test": "XDEBUG_MODE=coverage phpunit --colors=always",
+    "test:coverage": "XDEBUG_MODE=coverage phpunit --coverage-text --coverage-clover=coverage/clover.xml"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "sort-packages": true
+  }
+}

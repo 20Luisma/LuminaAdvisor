@@ -49,8 +49,8 @@
 
     <!-- Input Bar -->
     <form id="copilotForm" class="copilot-input-bar">
-      <input type="text" id="copilotInput" class="copilot-text-input" placeholder="Escribile a Lumina (ej: ¿dónde pongo el foco?)..." autocomplete="off">
-      <button type="submit" id="copilotSendBtn" class="copilot-send-btn" title="Enviar mensaje">
+      <input type="text" id="copilotInput" class="copilot-text-input" aria-label="Escribir pregunta para Lumina" placeholder="Escribile a Lumina (ej: ¿dónde pongo el foco?)..." autocomplete="off">
+      <button type="submit" id="copilotSendBtn" class="copilot-send-btn" title="Enviar mensaje" aria-label="Enviar mensaje">
         ➤
       </button>
     </form>

@@ -8,36 +8,49 @@ use LuminaAdvisor\Infrastructure\AI\GeminiInteriorAdvisor;
 
 final class ChatController
 {
+    public function __construct(
+        private readonly ?GeminiInteriorAdvisor $advisor = null,
+    ) {}
+
     public function handle(): void
     {
-        header('Content-Type: application/json; charset=utf-8');
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            http_response_code(405);
-            echo json_encode(['ok' => false, 'error' => 'Método no permitido']);
-            return;
+        if (!headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
         }
 
-        $inputRaw = file_get_contents('php://input');
-        $payload  = json_decode((string) $inputRaw, true);
+        $method   = (string) ($_SERVER['REQUEST_METHOD'] ?? 'GET');
+        $inputRaw = (string) file_get_contents('php://input');
 
+        [$statusCode, $responseBody] = $this->processRequest($method, $inputRaw);
+
+        http_response_code($statusCode);
+        echo json_encode($responseBody, JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Procesa una petición de chat y devuelve [statusCode, payload] (testeable sin HTTP real).
+     *
+     * @return array{0: int, 1: array<string, mixed>}
+     */
+    public function processRequest(string $method, string $inputRaw): array
+    {
+        if ($method !== 'POST') {
+            return [405, ['ok' => false, 'error' => 'Método no permitido']];
+        }
+
+        $payload = json_decode($inputRaw, true);
         if (!is_array($payload)) {
-            http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'JSON inválido']);
-            return;
+            return [400, ['ok' => false, 'error' => 'JSON inválido']];
         }
 
         $message = trim((string) ($payload['message'] ?? ''));
-        $context = (array) ($payload['context'] ?? []);
-        $history = (array) ($payload['history'] ?? []);
+        $context = is_array($payload['context'] ?? null) ? $payload['context'] : [];
+        $history = is_array($payload['history'] ?? null) ? $payload['history'] : [];
 
         if ($message === '') {
-            http_response_code(422);
-            echo json_encode(['ok' => false, 'error' => 'El mensaje no puede estar vacío']);
-            return;
+            return [422, ['ok' => false, 'error' => 'El mensaje no puede estar vacío']];
         }
 
-        // Sanitización básica de inputs
         $cleanContext = [
             'type'                => htmlspecialchars((string) ($context['type'] ?? 'habitación'), ENT_QUOTES, 'UTF-8'),
             'square_meters'       => (float) ($context['square_meters'] ?? 10.0),
@@ -50,13 +63,9 @@ final class ChatController
             'color_category'      => htmlspecialchars((string) ($context['color_category'] ?? 'cálida'), ENT_QUOTES, 'UTF-8'),
         ];
 
-        $advisor = new GeminiInteriorAdvisor();
+        $advisor = $this->advisor ?? new GeminiInteriorAdvisor();
         $reply   = $advisor->chat($message, $cleanContext, $history);
 
-        echo json_encode([
-            'ok'    => true,
-            'reply' => $reply,
-        ], JSON_UNESCAPED_UNICODE);
+        return [200, ['ok' => true, 'reply' => $reply]];
     }
 }
-
